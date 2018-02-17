@@ -5,3 +5,4 @@ flask_restful
 flask-jsonpify
 requests
 gunicorn
+pyOpenSSL>=0.14
