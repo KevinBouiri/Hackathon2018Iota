@@ -35,7 +35,7 @@ class Car:
             ],
         )
 
-    def getAPI(self):
+    def __getAPI(self):
         return self.api
 
 
@@ -49,18 +49,18 @@ def test():
     address = mycar.getAddress(2)
     print('Neue Adresse: ' + str(address['addresses'][0]))
 
-    bundles_count_pre = mycar.getAPI().get_transfers()['bundles']
+    bundles_count_pre = mycar.__getAPI().get_transfers()['bundles']
 
     print("Sende 0 IOTA an die neue Addresse")
     mycar.sendiota(address['addresses'][1], 0)
     print('Senden gestartet. Es wird auf die bestätigung der Tranbsaktion gewartet.')
 
-    while bundles_count_pre == mycar.getAPI().get_transfers()['bundles']:
+    while bundles_count_pre == mycar.__getAPI().get_transfers()['bundles']:
         print('.', end='', flush=True)
 
     print("IOTA sind angekommen.")
 
-    print('Neuer IOTA Kontostand: ' + str(mycar.getAPI().get_inputs()['totalBalance']))
+    print('Neuer IOTA Kontostand: ' + str(mycar.__getAPI().get_inputs()['totalBalance']))
 
 
 def test2():
