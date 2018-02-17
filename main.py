@@ -23,9 +23,9 @@ class Identify(Resource):
 
 
 class Payment(Resource):
-    def get(self, adress, amount):
-
-        return jsonify(result)
+    def get(self, adress, amount=0):
+        car.sendiota(adress, float(amount))
+        return {'payment': 'OK'}
 
 
 api.add_resource(Identify, '/identify')  # Route_1
@@ -33,4 +33,4 @@ api.add_resource(Payment, '/payments/<adress>/<amount>')  # Route_2
 
 
 if __name__ == '__main__':
-    app.run(port=5002)
+    app.run(port=5002, debug=True)
