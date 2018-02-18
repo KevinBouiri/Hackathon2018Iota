@@ -106,9 +106,10 @@ def Led(x):
 
 def Print(x):
     if x == 1:
-        print('*************************')
-        print('*   Light was blocked   *')
-        print('*************************')
+        pass
+        # print('*************************')
+        # print('*   Light was blocked   *')
+        # print('*************************')
 
 
 def detect(chn):
@@ -143,7 +144,7 @@ GPIO.add_event_detect(PIPin, GPIO.BOTH, callback=detect, bouncetime=200)
 # IOTA Transaktion auslösen.
 # Schannke geht auf, wenn die Transaktion fertig ist.
 
-PI_CAR = 'http://127.0.0.1:5002'
+PI_CAR = 'https://iota-car.herokuapp.com'
 
 parkingspace_is_free = True
 
@@ -152,13 +153,14 @@ def parkingspace(parkingspace_is_free):
     conn = sqlite3.connect('cars.db')
     c = conn.cursor()
     if parkingspace_is_free:
+        print('Auto ist auf dem Parkplatz')
         GPIO.output(Rpin, 1)
         GPIO.output(Gpin, 0)
         # check ob die ein element in der lichtschranke ist
         # Identität des Autos erfragen
         r = requests.get(PI_CAR + '/identify')
         answer = r.json()['identity']
-
+        print('Auto hat die IOTA ID: ' + str(answer))
         c.execute("INSERT INTO cars (address, timestamp) VALUES ('" + answer + "','" + str(datetime.now()) + "')")
         conn.commit()
 
@@ -167,16 +169,17 @@ def parkingspace(parkingspace_is_free):
         GPIO.output(Gpin, 1)
         r = requests.get(PI_CAR + '/identify')
         answer = r.json()['identity']
-        timestamp_des_parkens = c.execute("SELECT timestamp FROM cars WHERE address = '" + answer + "'").fetchone()
-        print(timestamp_des_parkens[0])
+        timestamp_des_parkens = c.execute("SELECT timestamp FROM cars WHERE address = '" + answer + "'").fetchall()[-1]
+        # print(timestamp_des_parkens[0])
         start = datetime.strptime(timestamp_des_parkens[0], '%Y-%m-%d %H:%M:%S.%f')
         end = datetime.now()
         diff = end-start
         diff_minutes = diff.seconds/60
-        print(diff_minutes)
+        print('Parkzeit: ' + str(round(diff_minutes, 2)) + '  Preis: ' + str(max(1.0, round(diff_minutes * 2.0))) + ' IOTA')
+        print('Transaktion gestartet.')
         r = requests.get(PI_CAR + '/payments/' + answer + '/0')
         if r.json()['payment'] == 'OK':
-            print("Fertig")
+            print("Transaktion Fertig")
             # Open der Schranke
             toLeft()
             sleep(2)
