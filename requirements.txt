@@ -6,3 +6,4 @@ flask-jsonpify
 requests
 gunicorn
 pyOpenSSL>=0.14
+flask-cors
